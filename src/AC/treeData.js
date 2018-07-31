@@ -1,7 +1,11 @@
 /**
  * Created by cyxap on 29.7.18.
  */
-import {UPDATE_TREE_DATA, DELETE_TREE_DATA, START, SUCCESS, GET_TREE_DATA, ADD_TREE_DATA_NODE} from '../constants'
+import {UPDATE_TREE_DATA, DELETE_TREE_DATA, START, SUCCESS, GET_TREE_DATA, ADD_TREE_DATA_NODE, FAIL} from '../constants'
+import {HOSTNAME} from '../constants/env-config'
+
+let jsonHeader = new Headers();
+jsonHeader.append('Content-type', 'application/json')
 
 let testDateDjango = [{
     id: 1, data: {name: 'Computer Hardware'},
@@ -23,24 +27,50 @@ export function getTreeData() {
             type: GET_TREE_DATA + START,
         });
 
-        setTimeout(() => {dispatch({
-            type: GET_TREE_DATA + SUCCESS,
-            payload: {treeData: testDateDjango }
-        })}, 1000)
-	}
+        fetch( `/api/category/list/`, {
+            method: 'GET',
+            headers: jsonHeader
+        })
+            .then((res) => res.json())
+            .then((data) => dispatch({
+                type: GET_TREE_DATA + SUCCESS,
+                payload: {treeData: data}
+            }))
+            .catch(err => dispatch({
+                type: FAIL
+            }))
+
+        // setTimeout(() => {dispatch({
+        //     type: GET_TREE_DATA + SUCCESS,
+        //     payload: {treeData: testDateDjango }
+        // })}, 1000)
+    }
 }
 
 export function deleteTreeDataNode(rowInfo) {
-	return (dispatch) => {
-		dispatch({
-			type: DELETE_TREE_DATA + START,
-		});
+    let {node: {id: nodeId}} = rowInfo;
+    return (dispatch) => {
+        dispatch({
+            type: DELETE_TREE_DATA + START,
+        });
 
-		setTimeout(() => {dispatch({
-            type: DELETE_TREE_DATA + SUCCESS,
-			payload: {rowInfo}
-        })}, 5000)
-	}
+        fetch(`/api/category/delete/?id=${nodeId}`, {
+            method: 'DELETE',
+            headers: jsonHeader
+        }).then((res) => {
+            dispatch({
+                type: DELETE_TREE_DATA + SUCCESS,
+                payload: {rowInfo}
+            })
+        }).catch(err => dispatch({
+            type: FAIL
+        }))
+
+        // setTimeout(() => {dispatch({
+        //     type: DELETE_TREE_DATA + SUCCESS,
+        // 	payload: {rowInfo}
+        // })}, 1000)
+    }
 }
 
 export function addTreeDataNode(rowInfo) {
@@ -49,10 +79,23 @@ export function addTreeDataNode(rowInfo) {
             type: ADD_TREE_DATA_NODE + START,
         });
 
-        setTimeout(() => {dispatch({
-            type: ADD_TREE_DATA_NODE + SUCCESS,
-            payload: {rowInfo}
-        })}, 1000)
+        // fetch(`${HOSTNAME}/category/delete/?id=${nodeId}`, {
+        //     method: 'DELETE'
+        // }).then((res) => {
+        //     dispatch({
+        //         type: DELETE_TREE_DATA + SUCCESS,
+        //         payload: {rowInfo}
+        //     })
+        // }).catch(err => dispatch({
+        //     type: FAIL
+        // }))
+
+        setTimeout(() => {
+            dispatch({
+                type: ADD_TREE_DATA_NODE + SUCCESS,
+                payload: {rowInfo}
+            })
+        }, 1000)
     }
 }
 
@@ -60,29 +103,44 @@ export function updateTreeData(treeDataInfo) {
     let {treeData, node, nextParentNode} = treeDataInfo;
 
     // this action need only to support default onChange props in ReactSortableTree for open and close tree node
-    if(!treeData){
-    	console.log('from action creator update', treeDataInfo, nextParentNode)
-			return{
-                type: UPDATE_TREE_DATA,
-                payload: {treeData: treeDataInfo}
-			}
-	}
-
-	return (dispatch) => {
+    if (!treeData) {
+        return {
+            type: UPDATE_TREE_DATA,
+            payload: {treeData: treeDataInfo}
+        }
+    }
+    console.log('parentNode', nextParentNode);
+    return (dispatch) => {
         let {id: nodeId} = node;
         let parentId = null;
 
-        if(!!nextParentNode) {
-            parentId = nextParentNode;
+        if (!!nextParentNode) {
+            parentId = nextParentNode.id;
         }
 
         dispatch({
             type: UPDATE_TREE_DATA + START,
         });
 
-        setTimeout(() => {dispatch({
-            type: UPDATE_TREE_DATA + SUCCESS,
-            payload: {treeData}
-        })}, 1000)
-	}
+        fetch(`/api/category/move/?parentId=${parentId}&id=${nodeId}`, {
+            method: 'DELETE',
+            headers: jsonHeader
+        })
+            .then(res => res.json())
+            .then((treeData) => {
+            dispatch({
+                type: DELETE_TREE_DATA + SUCCESS,
+                payload: {treeData}
+            })
+        }).catch( err => dispatch({
+            type: FAIL
+        }))
+
+        // setTimeout(() => {
+        //     dispatch({
+        //         type: UPDATE_TREE_DATA + SUCCESS,
+        //         payload: {treeData}
+        //     })
+        // }, 1000)
+    }
 }

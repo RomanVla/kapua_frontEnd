@@ -8,7 +8,7 @@ import {
     SUCCESS,
     GET_TREE_DATA,
     ADD_TREE_DATA_NODE,
-    CHANGE_TREE_DATA
+    FAIL
 } from '../constants'
 
 import {addNodeUnderParent, getNodeAtPath, removeNodeAtPath} from "react-sortable-tree";
@@ -40,7 +40,6 @@ export default function (dataTreeState = defaultState, action) {
             };
 
         case UPDATE_TREE_DATA:
-        	console.log('from reducer update', payload.treeData )
             return {...dataTreeState,
                 treeData: payload.treeData,
             };
@@ -53,23 +52,12 @@ export default function (dataTreeState = defaultState, action) {
             };
 
         case UPDATE_TREE_DATA + SUCCESS:
-        	console.log('actual tree data after update', addTitle(payload.treeData) )
+
             return{
                 treeData: addTitle(payload.treeData),
                 loading: false,
                 loaded: true
             };
-
-        // case UPDATE_TREE_DATA + START:
-        //     return {...dataTreeState,
-        //         loading: true,
-        //         loaded: false};
-		//
-        // case UPDATE_TREE_DATA + SUCCESS:
-        //     return {treeData: addTitle(payload.treeData),
-        //         loading: false,
-        //         loaded: true
-        //     };
 
         case DELETE_TREE_DATA + START:
             return {...dataTreeState,
@@ -89,7 +77,13 @@ export default function (dataTreeState = defaultState, action) {
         case ADD_TREE_DATA_NODE + SUCCESS:
             return {treeData: addNode(payload.rowInfo, treeData).treeData,
                 loading: false,
-                loaded: true}
+                loaded: true }
+        case FAIL:
+            return{
+                ...dataTreeState,
+                loading: false,
+                loaded: false
+            }
     }
 	return dataTreeState
 }

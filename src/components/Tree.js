@@ -4,6 +4,7 @@ import SortableTree from 'react-sortable-tree';
 import 'react-sortable-tree/style.css';
 
 import {updateTreeData, deleteTreeDataNode, getTreeData, addTreeDataNode } from '../AC/treeData'
+import {SearchingNodeForm} from "./SearchingForm";
 
 export class Tree extends Component {
     constructor(props) {
@@ -11,38 +12,48 @@ export class Tree extends Component {
         this.deleteTreeDataNode = this.props.deleteTreeDataNode;
         this.addTreeDataNode = this.props.addTreeDataNode;
         this.updateTreeData = this.props.updateTreeData;
+
+        this.state = {
+            searchingString: "",
+            nodeMatchesCount: 0,
+            searchFocusOffset: 0
+        }
 	}
 
     componentDidMount() {
 		this.props.getTreeData()
 	}
 
-    getLoaderBody(){
-        return (<div>Loading...</div>)
-    }
-
     render() {
 		let {treeData, loading, loaded} = this.props.treeDataState;
 
-        let loader = this.getLoaderBody();
-        console.log('from render', this.props)
-		if (loading ) {
-		    return loader
-		}
-        console.log()
+		if ( loading ) { return this.getLoaderBody() }
+		if ( !loaded ) {return this.getErrorBody()}
 		return (
             <div style={{ height: 400 }}>
+
+                <SearchingNodeForm nodeMatchesCount={this.state.nodeMatchesCount}
+                                   searchFocusOffset={this.state.searchFocusOffset}
+                                   searchingString={this.state.searchingString}
+                                   updateSearchingString={this.updateSearchingString}
+                                   changeOffset={this.changeOffset}/>
                 <SortableTree
                     treeData={treeData}
-                    onChange={ treeData => {console.log('from on change', treeData); this.updateTreeData(treeData); }}
+                    onChange={ treeData => this.updateTreeData(treeData)}
                     onMoveNode={ ({ treeData, node, nextParentNode}) => {this.updateTreeData({treeData, node, nextParentNode})}}
+                    searchQuery={this.state.searchingString}
+                    searchFinishCallback={ (matches) => {
+                        this.calculateMatches(matches)
+                        }
+                    }
+                    searchFocusOffset={this.state.searchFocusOffset}
                     generateNodeProps={rowInfo => ({
                         buttons: [
                             <div >
                                 <button label='Delete'
-                                        onClick={(event) => {console.log(rowInfo);this.deleteTreeDataNode(rowInfo)}}>Remove</button>
-                                <button label='Add'
-                                        onClick={(event) =>  this.addTreeDataNode(rowInfo)}>Add</button>
+                                        onClick={(event) => this.deleteTreeDataNode(rowInfo)}>Remove</button>
+                                {/*<button label='Add'*/}
+                                        {/*onClick={(event) =>  this.addTreeDataNode(rowInfo)}>Add</button>*/}
                             </div>,
                         ],
                         style: {
@@ -52,6 +63,51 @@ export class Tree extends Component {
                 />
             </div>
         );
+    }
+
+    getLoaderBody(){
+        return (<div>Loading...</div>)
+    }
+
+    getErrorBody(){
+        return(<div>Error</div>)
+    }
+
+    updateSearchingString = (searchingString) => {
+        this.setState({searchingString,
+            searchFocusOffset: 0
+        })
+    };
+
+    calculateMatches = (matches) => {
+        this.setState({
+            nodeMatchesCount: matches.length
+        })
+    };
+
+    changeOffset = ({changeOn: offset}) => {
+        let searchFocusOffset = this.restrictionForOffset(offset);
+
+        this.setState((prevState, props) => {
+            return {
+                searchFocusOffset: searchFocusOffset
+            }
+        })
+    };
+
+    restrictionForOffset = (offset) => {
+        let searchFocusOffset = this.state.searchFocusOffset;
+
+        if (this.state.nodeMatchesCount === 0) {
+            searchFocusOffset = 0
+        } else if (this.state.searchFocusOffset + offset >= this.state.nodeMatchesCount) {
+            searchFocusOffset = 0
+        } else if (this.state.searchFocusOffset + offset < 0) {
+            searchFocusOffset = this.state.nodeMatchesCount - 1
+        } else {
+            searchFocusOffset += offset
+        }
+        return searchFocusOffset;
     }
 }
 
