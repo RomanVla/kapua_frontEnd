@@ -10,12 +10,22 @@ module.exports = {
         filename: 'bundle.js',
         publicPath: '/static/'
     },
+
     devServer: {
-        proxy: [{
-            path: '/api/',
-            target: 'http://tenant2.my-domain.com:8000'
-        }],
-        historyApiFallback: true
+        host: 'tenant2.my-domain.com',
+        port: 3000,
+        historyApiFallback: true,
+        proxy: {
+            '/api/': {
+                target: 'http://tenant2.my-domain.com:8000'
+            }  
+        },
+
+        allowedHosts: [
+            'my-domain.com', 
+            'tenant.my-domain.com', 
+            'tenant2.my-domain.com'
+        ]
     },
     module: {
         loaders: [

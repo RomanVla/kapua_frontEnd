@@ -7,29 +7,14 @@ import {HOSTNAME} from '../constants/env-config'
 let jsonHeader = new Headers();
 jsonHeader.append('Content-type', 'application/json')
 
-let testDateDjango = [{
-    id: 1, data: {name: 'Computer Hardware'},
-    children: [
-        {id: 3, data: {name: 'Hard Drives'}},
-        {
-            id: 2, data: {name: 'Memory'},
-            children: [
-                {id: 5, data: {name: 'Desktop Memory'}},
-                {id: 6, data: {name: 'Laptop Memory'}},
-                {id: 7, data: {name: 'Server Memory'}}]
-        },
-        {id: 4, data: {name: 'SSD'}}]
-}];
-
 export function getTreeData() {
     return (dispatch) => {
         dispatch({
             type: GET_TREE_DATA + START,
         });
 
-        fetch( `/api/category/list/`, {
-            method: 'GET',
-            headers: jsonHeader
+        fetch( '/api/list/', {
+            method: 'GET'
         })
             .then((res) => res.json())
             .then((data) => dispatch({
@@ -39,11 +24,6 @@ export function getTreeData() {
             .catch(err => dispatch({
                 type: FAIL
             }))
-
-        // setTimeout(() => {dispatch({
-        //     type: GET_TREE_DATA + SUCCESS,
-        //     payload: {treeData: testDateDjango }
-        // })}, 1000)
     }
 }
 
@@ -54,9 +34,8 @@ export function deleteTreeDataNode(rowInfo) {
             type: DELETE_TREE_DATA + START,
         });
 
-        fetch(`/api/category/delete/?id=${nodeId}`, {
-            method: 'DELETE',
-            headers: jsonHeader
+        fetch(`/api/delete/?id=${nodeId}`, {
+            method: 'GET'
         }).then((res) => {
             dispatch({
                 type: DELETE_TREE_DATA + SUCCESS,
@@ -65,11 +44,6 @@ export function deleteTreeDataNode(rowInfo) {
         }).catch(err => dispatch({
             type: FAIL
         }))
-
-        // setTimeout(() => {dispatch({
-        //     type: DELETE_TREE_DATA + SUCCESS,
-        // 	payload: {rowInfo}
-        // })}, 1000)
     }
 }
 
@@ -78,17 +52,6 @@ export function addTreeDataNode(rowInfo) {
         dispatch({
             type: ADD_TREE_DATA_NODE + START,
         });
-
-        // fetch(`${HOSTNAME}/category/delete/?id=${nodeId}`, {
-        //     method: 'DELETE'
-        // }).then((res) => {
-        //     dispatch({
-        //         type: DELETE_TREE_DATA + SUCCESS,
-        //         payload: {rowInfo}
-        //     })
-        // }).catch(err => dispatch({
-        //     type: FAIL
-        // }))
 
         setTimeout(() => {
             dispatch({
@@ -110,7 +73,8 @@ export function updateTreeData(treeDataInfo) {
         }
     }
     console.log('parentNode', nextParentNode);
-    return (dispatch) => {
+    return (dispatch) =>
+    {
         let {id: nodeId} = node;
         let parentId = null;
 
@@ -122,9 +86,8 @@ export function updateTreeData(treeDataInfo) {
             type: UPDATE_TREE_DATA + START,
         });
 
-        fetch(`/api/category/move/?parentId=${parentId}&id=${nodeId}`, {
-            method: 'DELETE',
-            headers: jsonHeader
+        fetch(`/api/move/?parentId=${parentId}&id=${nodeId}`, {
+            method: 'GET'
         })
             .then(res => res.json())
             .then((treeData) => {
