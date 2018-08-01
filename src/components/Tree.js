@@ -28,7 +28,7 @@ export class Tree extends Component {
 		let {treeData} = this.props.treeDataState;
 
 		return (
-            <div style={{ height: 400 }}>
+            <div style={{ height: 1000 }}>
 
                 <SearchingNodeForm nodeMatchesCount={this.state.nodeMatchesCount}
                                    searchFocusOffset={this.state.searchFocusOffset}
