@@ -35,15 +35,20 @@ export function deleteTreeDataNode(rowInfo) {
         });
 
         fetch(`/api/delete/?id=${nodeId}`, {
-            method: 'GET'
-        }).then((res) => {
+            method: 'DELETE'
+        }).then(res => res.json())
+            .then((res) => {
+            console.log('From dlete', res);
             dispatch({
                 type: DELETE_TREE_DATA + SUCCESS,
                 payload: {rowInfo}
             })
-        }).catch(err => dispatch({
-            type: FAIL
-        }))
+        }).catch(err => {
+            console.log('From dlete error', err);
+            dispatch({
+                type: FAIL
+            })}
+        )
     }
 }
 
@@ -87,7 +92,7 @@ export function updateTreeData(treeDataInfo) {
         });
 
         fetch(`/api/move/?parentId=${parentId}&id=${nodeId}`, {
-            method: 'GET'
+            method: 'PATCH'
         })
             .then(res => res.json())
             .then((treeData) => {
