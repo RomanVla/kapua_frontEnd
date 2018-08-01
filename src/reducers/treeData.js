@@ -27,7 +27,7 @@ export default function (dataTreeState = defaultState, action) {
 
         case GET_TREE_DATA + START:
             return {
-                treeData: {},
+                treeData: [],
                 loading: true,
                 loaded: false
             };
@@ -60,12 +60,12 @@ export default function (dataTreeState = defaultState, action) {
             };
 
         case DELETE_TREE_DATA + START:
-            return {...dataTreeState,
+            return {treeData: removeNode(payload.rowInfo, treeData),
                 loading: true,
                 loaded: false };
 
         case DELETE_TREE_DATA + SUCCESS:
-            return {treeData: removeNode(payload.rowInfo, treeData),
+            return {...dataTreeState,
                 loading: false,
                 loaded: true}
 

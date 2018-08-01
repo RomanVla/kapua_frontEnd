@@ -25,10 +25,8 @@ export class Tree extends Component {
 	}
 
     render() {
-		let {treeData, loading, loaded} = this.props.treeDataState;
+		let {treeData} = this.props.treeDataState;
 
-		if ( loading ) { return this.getLoaderBody() }
-		if ( !loaded ) {return this.getErrorBody()}
 		return (
             <div style={{ height: 400 }}>
 
@@ -37,6 +35,11 @@ export class Tree extends Component {
                                    searchingString={this.state.searchingString}
                                    updateSearchingString={this.updateSearchingString}
                                    changeOffset={this.changeOffset}/>
+
+                    {this.getLoaderBody()}
+                    {this.getErrorBody()}
+
+
                 <SortableTree
                     treeData={treeData}
                     onChange={ treeData => this.updateTreeData(treeData)}
@@ -52,8 +55,6 @@ export class Tree extends Component {
                             <div >
                                 <button label='Delete'
                                         onClick={(event) => this.deleteTreeDataNode(rowInfo)}>Remove</button>
-                                {/*<button label='Add'*/}
-                                        {/*onClick={(event) =>  this.addTreeDataNode(rowInfo)}>Add</button>*/}
                             </div>,
                         ],
                         style: {
@@ -66,11 +67,15 @@ export class Tree extends Component {
     }
 
     getLoaderBody(){
-        return (<div>Loading...</div>)
+        let {loading} = this.props.treeDataState;
+        if(loading)return (<div>Processing...</div>)
     }
 
     getErrorBody(){
-        return(<div>Error</div>)
+        let {loaded, loading} = this.props.treeDataState;
+        if(!loaded && !loading) {
+            this.props.getTreeData();
+            return(<div>Error..Receiving actual data</div>)}
     }
 
     updateSearchingString = (searchingString) => {

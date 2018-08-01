@@ -8,6 +8,7 @@ let jsonHeader = new Headers();
 jsonHeader.append('Content-type', 'application/json')
 
 export function getTreeData() {
+
     return (dispatch) => {
         dispatch({
             type: GET_TREE_DATA + START,
@@ -32,6 +33,7 @@ export function deleteTreeDataNode(rowInfo) {
     return (dispatch) => {
         dispatch({
             type: DELETE_TREE_DATA + START,
+            payload: {rowInfo}
         });
 
         fetch(`/api/delete/?id=${nodeId}`, {
@@ -40,8 +42,7 @@ export function deleteTreeDataNode(rowInfo) {
             .then((res) => {
             console.log('From dlete', res);
             dispatch({
-                type: DELETE_TREE_DATA + SUCCESS,
-                payload: {rowInfo}
+                type: DELETE_TREE_DATA + SUCCESS
             })
         }).catch(err => {
             console.log('From dlete error', err);
@@ -104,11 +105,6 @@ export function updateTreeData(treeDataInfo) {
             type: FAIL
         }))
 
-        // setTimeout(() => {
-        //     dispatch({
-        //         type: UPDATE_TREE_DATA + SUCCESS,
-        //         payload: {treeData}
-        //     })
-        // }, 1000)
+
     }
 }

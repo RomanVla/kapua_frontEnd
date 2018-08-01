@@ -9,7 +9,7 @@ class App extends Component {
   render() {
     return (
         <div>
-            <div style={ {margin: '0 auto'}}>Welcome to django tenant </div>
+            <div style={ {margin: '0 auto'}}>Searching form </div>
             <Route path="/tree" component={Tree} />
         </div>
 
