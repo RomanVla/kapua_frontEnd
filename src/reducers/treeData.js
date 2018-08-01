@@ -54,7 +54,7 @@ export default function (dataTreeState = defaultState, action) {
         case UPDATE_TREE_DATA + SUCCESS:
 
             return{
-                treeData: addTitle(payload.treeData),
+                ...dataTreeState,
                 loading: false,
                 loaded: true
             };

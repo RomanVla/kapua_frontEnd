@@ -81,7 +81,7 @@ export function updateTreeData(treeDataInfo) {
     return (dispatch) =>
     {
         let {id: nodeId} = node;
-        let parentId = null;
+        let parentId = 0;
 
         if (!!nextParentNode) {
             parentId = nextParentNode.id;
@@ -97,7 +97,7 @@ export function updateTreeData(treeDataInfo) {
             .then(res => res.json())
             .then((treeData) => {
             dispatch({
-                type: DELETE_TREE_DATA + SUCCESS,
+                type: UPDATE_TREE_DATA + SUCCESS,
                 payload: {treeData}
             })
         }).catch( err => dispatch({
